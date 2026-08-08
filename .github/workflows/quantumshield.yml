@@ -28,7 +28,7 @@ jobs:
           ref: main
           path: quantumshield-tool
 
-      # Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -54,25 +54,27 @@ jobs:
             --exclude output \
             --json target/output/inventory.json
 
-      # Risk analysis
+      # Analyze quantum risk
       - name: Analyze quantum risk
+        working-directory: target
         run: |
-          python quantumshield-tool/pqcscan.py \
-            --risk target/output/inventory.json
+          python ../quantumshield-tool/pqcscan.py \
+            --risk output/inventory.json
 
-      # Migration recommendations
+      # Generate migration recommendations
       - name: Generate migration recommendations
+        working-directory: target
         run: |
-          python quantumshield-tool/pqcscan.py \
-            --recommend target/output/risk_report.json
+          python ../quantumshield-tool/pqcscan.py \
+            --recommend output/risk_report.json
 
-      # CBOM + SARIF
+      # Generate CBOM and SARIF
       - name: Generate CBOM and SARIF
+        working-directory: target
         run: |
-          cd target
           python ../quantumshield-tool/pqcscan.py --export all
 
-      # Upload SARIF
+      # Upload SARIF to GitHub Code Scanning
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
         with:
