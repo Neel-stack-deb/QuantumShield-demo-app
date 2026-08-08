@@ -45,14 +45,20 @@ jobs:
         run: |
           mkdir -p target/output
 
+      - name: Verify target repository
+        run: |
+          echo "Target repository files:"
+          find target -maxdepth 2 -type f | sort
+
       # Scan target repository
       - name: Scan cryptographic assets
+        working-directory: target
         run: |
-          python quantumshield-tool/pqcscan.py target \
+          python ../quantumshield-tool/pqcscan.py . \
             --exclude .git \
             --exclude .github \
             --exclude output \
-            --json target/output/inventory.json
+            --json output/inventory.json
 
       # Analyze quantum risk
       - name: Analyze quantum risk
