@@ -14,45 +14,67 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # Checkout the repository being protected
+      - name: Checkout target repository
         uses: actions/checkout@v6
+        with:
+          path: target
 
+      # Checkout QuantumShield
+      - name: Checkout QuantumShield
+        uses: actions/checkout@v6
+        with:
+          repository: Neel-stack-deb/QuantumShield
+          ref: main
+          path: quantumshield-tool
+
+      # Python
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      # Install QuantumShield dependencies
+      - name: Install QuantumShield dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r quantumshield-tool/requirements.txt
 
-      - name: Run QuantumShield tests
-        run: |
-          python -m unittest discover -s tests -v
-
+      # Create output directory
       - name: Create output directory
         run: |
-          mkdir -p output
+          mkdir -p target/output
 
+      # Scan target repository
       - name: Scan cryptographic assets
         run: |
-          python pqcscan.py . --exclude tests --json output/inventory.json
+          python quantumshield-tool/pqcscan.py target \
+            --exclude .git \
+            --exclude .github \
+            --exclude output \
+            --json target/output/inventory.json
 
+      # Risk analysis
       - name: Analyze quantum risk
         run: |
-          python pqcscan.py --risk output/inventory.json
+          python quantumshield-tool/pqcscan.py \
+            --risk target/output/inventory.json
 
+      # Migration recommendations
       - name: Generate migration recommendations
         run: |
-          python pqcscan.py --recommend output/risk_report.json
+          python quantumshield-tool/pqcscan.py \
+            --recommend target/output/risk_report.json
 
+      # CBOM + SARIF
       - name: Generate CBOM and SARIF
         run: |
-          python pqcscan.py --export all
+          cd target
+          python ../quantumshield-tool/pqcscan.py --export all
 
+      # Upload SARIF
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: output/results.sarif
+          sarif_file: target/output/results.sarif
           category: quantumshield
