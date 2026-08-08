@@ -55,10 +55,11 @@ jobs:
         working-directory: target
         run: |
           python ../quantumshield-tool/pqcscan.py . \
-            --exclude .git \
-            --exclude .github \
-            --exclude output \
             --json output/inventory.json
+            # --exclude .git \
+            # --exclude .github \
+            # --exclude output \
+            # --json output/inventory.json
 
       # Analyze quantum risk
       - name: Analyze quantum risk
