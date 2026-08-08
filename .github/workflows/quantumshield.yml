@@ -74,6 +74,55 @@ jobs:
         run: |
           python ../quantumshield-tool/pqcscan.py --export all
 
+      - name: Inspect QuantumShield results
+        run: |
+          echo "========================================"
+          echo "QuantumShield Output Inspection"
+          echo "========================================"
+
+          echo ""
+          echo "Inventory:"
+          python - <<'PY'
+          import json
+
+          with open("target/output/inventory.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          findings = data.get("findings", [])
+          print("Inventory findings:", len(findings))
+          PY
+
+          echo ""
+          echo "Risk report:"
+          python - <<'PY'
+          import json
+
+          with open("target/output/risk_report.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          findings = data.get("findings", [])
+          print("Risk findings:", len(findings))
+          PY
+
+          echo ""
+          echo "SARIF:"
+          python - <<'PY'
+          import json
+
+          with open("target/output/results.sarif", encoding="utf-8") as f:
+              data = json.load(f)
+
+          runs = data.get("runs", [])
+          total = sum(len(run.get("results", [])) for run in runs)
+
+          print("SARIF runs:", len(runs))
+          print("SARIF results:", total)
+
+          for run in runs:
+              print("Tool:", run.get("tool", {}).get("driver", {}).get("name"))
+              print("Results:", len(run.get("results", [])))
+          PY
+
       # Upload SARIF to GitHub Code Scanning
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v4
