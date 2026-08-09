@@ -1,10 +1,6 @@
-# Internet-facing authentication API protecting customer credentials
-# and long-term financial records.
-#
-# Data retention: long_term
-# Exposure: public API
-# Sensitivity: customer credentials / financial data
-
 from Crypto.PublicKey import RSA
 
+# Internet-facing authentication API.
+# Protects customer credentials and financial records.
+# Long-term retention for authentication history.
 key = RSA.generate(2048)
