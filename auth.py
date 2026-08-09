@@ -1,9 +1,10 @@
+# Internet-facing authentication API protecting customer credentials
+# and long-term financial records.
+#
+# Data retention: long_term
+# Exposure: public API
+# Sensitivity: customer credentials / financial data
+
 from Crypto.PublicKey import RSA
 
-# Legacy authentication key.
-# QuantumShield should detect RSA-2048.
 key = RSA.generate(2048)
-
-
-def authenticate(message):
-    return key.public_key().export_key()
