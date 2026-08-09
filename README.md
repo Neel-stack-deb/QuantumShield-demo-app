@@ -1,4 +1,5 @@
 # QuantumShield Demo Application
+Debarshi Majumder (24BCE7692)
 
 A deliberately mixed cryptographic demo application for testing
 QuantumShield's post-quantum cryptography assessment workflow.
